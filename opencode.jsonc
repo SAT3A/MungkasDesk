@@ -1,0 +1,37 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+
+  // ============================================================
+  // CONFIG KHUSUS PROJECT MungkasDesk
+  // File ini merge DI ATAS config global (~/.config/opencode/opencode.json),
+  // jadi setting yang tidak ditulis di sini tetap diwarisi dari global.
+  //
+  // PENTING: blok "providers" SENGAJA tidak di-copy ke file ini.
+  // Provider bansos-ai (beserta API key-nya) hidup di config global
+  // yang tidak ke-push — repo ini public. Model "bansos-ai/*" tetap
+  // bisa dipakai karena global config selalu ke-load dulu.
+  // ============================================================
+
+  "model": "bansos-ai/codingforFree",
+
+  "permissions": [
+    {
+      "action": "external_directory",
+      "resource": "*",
+      "effect": "ask"
+    }
+  ],
+
+  "experimental": {
+    "todo": true
+  },
+
+  // ============================================================
+  // AGENTS
+  // planner / executor / testing didefinisikan sebagai Markdown agent
+  // di .opencode/agents/ (planner.md, executor.md, testing.md) — masing-masing
+  // mode "all": bisa dipanggil sebagai subagent atau dipilih langsung (Tab).
+  // ============================================================
+  "agents": {
+  }
+}
