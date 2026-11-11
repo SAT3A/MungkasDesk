@@ -1,0 +1,9 @@
+# Build artifacts
+*.exe
+
+# Kredensial lokal (lihat backend/.env.example)
+backend/.env
+
+# OS / editor
+Thumbs.db
+.DS_Store

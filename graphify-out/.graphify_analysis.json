@@ -1,0 +1,128 @@
+{
+  "communities": {
+    "0": [
+      "api_createuserinput",
+      "api_updateuserinput",
+      "backend_cmd_api_main",
+      "go_pkg_context",
+      "go_pkg_errors",
+      "go_pkg_fmt",
+      "go_pkg_github_com_gin_gonic_gin",
+      "go_pkg_github_com_google_uuid",
+      "go_pkg_github_com_jackc_pgx_v5",
+      "go_pkg_github_com_jackc_pgx_v5_pgconn",
+      "go_pkg_github_com_jackc_pgx_v5_pgxpool",
+      "go_pkg_golang_org_x_crypto_bcrypt",
+      "go_pkg_log",
+      "go_pkg_net_http",
+      "go_pkg_os",
+      "go_pkg_strings",
+      "go_pkg_time",
+      "go_pkg_unicode",
+      "go_pkg_unicode_utf8",
+      "go_type_github_com_jackc_pgx_v5_pgxpool_pool"
+    ],
+    "1": [
+      "backend_cmd_api_main_gethealth",
+      "backend_cmd_api_main_getuserbyid",
+      "backend_cmd_api_main_getusers",
+      "backend_cmd_api_main_parseuserid",
+      "backend_cmd_api_main_softdeleteuser",
+      "backend_cmd_api_main_updateuser",
+      "go_type_github_com_gin_gonic_gin_context"
+    ],
+    "2": [
+      "backend_cmd_api_main_containssymbol",
+      "backend_cmd_api_main_containsupper",
+      "backend_cmd_api_main_createuser"
+    ],
+    "3": [
+      "api_user",
+      "go_type_time_time"
+    ],
+    "4": [
+      "backend_cmd_api_main_connectdb",
+      "backend_cmd_api_main_main"
+    ],
+    "5": [
+      "pkg_mungkasdesk_backend"
+    ]
+  },
+  "cohesion": {
+    "0": 0.1,
+    "1": 0.42857142857142855,
+    "2": 0.6666666666666666,
+    "3": 1.0,
+    "4": 1.0,
+    "5": 1.0
+  },
+  "gods": [
+    {
+      "id": "backend_cmd_api_main_parseuserid",
+      "label": "parseUserID()",
+      "degree": 5
+    },
+    {
+      "id": "backend_cmd_api_main_createuser",
+      "label": "createUser()",
+      "degree": 4
+    },
+    {
+      "id": "backend_cmd_api_main_getuserbyid",
+      "label": "getUserByID()",
+      "degree": 3
+    },
+    {
+      "id": "backend_cmd_api_main_updateuser",
+      "label": "updateUser()",
+      "degree": 3
+    },
+    {
+      "id": "backend_cmd_api_main_softdeleteuser",
+      "label": "softDeleteUser()",
+      "degree": 3
+    },
+    {
+      "id": "api_user",
+      "label": "User",
+      "degree": 2
+    },
+    {
+      "id": "backend_cmd_api_main_connectdb",
+      "label": "connectDB()",
+      "degree": 2
+    },
+    {
+      "id": "backend_cmd_api_main_gethealth",
+      "label": "getHealth()",
+      "degree": 2
+    },
+    {
+      "id": "backend_cmd_api_main_getusers",
+      "label": "getUsers()",
+      "degree": 2
+    },
+    {
+      "id": "backend_cmd_api_main_containsupper",
+      "label": "containsUpper()",
+      "degree": 2
+    }
+  ],
+  "surprises": [
+    {
+      "source": "createUser()",
+      "target": "github.com/gin-gonic/gin.Context",
+      "source_files": [
+        "backend/cmd/api/main.go",
+        ""
+      ],
+      "confidence": "EXTRACTED",
+      "relation": "references",
+      "note": "Bridges community 2 \u2192 community 1"
+    }
+  ],
+  "tokens": {
+    "input": 0,
+    "output": 0
+  }
+}

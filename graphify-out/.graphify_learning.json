@@ -1,0 +1,22 @@
+{
+  "generated_at": "2026-11-11T07:37:09.957057+00:00",
+  "nodes": {
+    "backend_cmd_api_main": {
+      "code_fingerprint": "0d67a881bdccd5018b1eebee0d576c1bd6b209c63c9b423c01db7f3de7bb1439",
+      "label": "main.go",
+      "last": "2026-11-11T07:36:54.417306+00:00",
+      "provenance": [
+        {
+          "date": "2026-11-11T07:36:54.417306+00:00",
+          "outcome": "useful",
+          "q": "Bagaimana cara apply perubahan schema database di project ini?"
+        }
+      ],
+      "score": 0.999995844,
+      "source_file": "backend/cmd/api/main.go",
+      "status": "tentative",
+      "uses": 1
+    }
+  },
+  "version": 1
+}

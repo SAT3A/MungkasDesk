@@ -1,0 +1,26 @@
+{
+  "backend/cmd/api/main.go": {
+    "mtime": 1794382190.6182275,
+    "seen": 1794382601.9213524,
+    "ast_hash": "eb2ec8a3511b78db34984b32b244e912",
+    "semantic_hash": ""
+  },
+  "backend/go.mod": {
+    "mtime": 1794212913.3788426,
+    "seen": 1794382075.6659064,
+    "ast_hash": "cfb0fd7d5073fc1d48e33aa25842c78a",
+    "semantic_hash": "cfb0fd7d5073fc1d48e33aa25842c78a"
+  },
+  "AGENTS.md": {
+    "mtime": 1794382040.2913733,
+    "seen": 1794382601.9213524,
+    "ast_hash": "f36539ecc9af68f33ebd72770ce4a19e",
+    "semantic_hash": ""
+  },
+  "PLAN.md": {
+    "mtime": 1794198605.461971,
+    "seen": 1794382601.9213524,
+    "ast_hash": "17eb1f773c03f9d94c1686e87a7fa9f0",
+    "semantic_hash": ""
+  }
+}
