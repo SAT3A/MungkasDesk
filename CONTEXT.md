@@ -3,7 +3,7 @@
 > Dokumen "otak project". Target pembaca: coding agent / developer lain yang perlu kerja di
 > repo ini **tanpa harus baca semua kode dari nol**. Ibarat handover ke tim IT berikutnya.
 >
-> Terakhir diperbarui: **12 November 2026** (agent `versioning` ditambahkan untuk urusan GitHub: push, tag/rilis, CHANGELOG, GitHub Actions).
+> Terakhir diperbarui: **12 November 2026** (backend di-refactor: 1 file jadi 6 file dalam 1 package — main.go jadi kerangka/route; agent `versioning` ada untuk urusan GitHub).
 > Kalau ada perubahan besar di kode, perbarui dokumen ini juga — dokumen basi lebih bahaya daripada tidak ada.
 
 ---
@@ -36,7 +36,9 @@ yang sudah diterbitkan manual. Satu pengguna (pemilik aplikasi), tidak ada regis
 **Status realita saat ini (pahami dulu SEBELUM ngoding):**
 
 - Yang **SUDAH ada**: satu REST API Go/Gin untuk **manajemen user** (CRUD + soft delete + login),
-  seluruhnya di **satu file** `backend/cmd/api/main.go` (~705 baris) + **satu tabel** `users` di PostgreSQL.
+  di folder `backend/cmd/api/` — **6 file dalam satu package `main`** (main.go = kerangka+route,
+  database.go, model.go, handlers_users.go, handlers_auth.go, validate.go; hasil refactor
+  12 Nov 2026 dari 1 file ~705 baris, tingkah laku API tidak berubah) + **satu tabel** `users` di PostgreSQL.
   Tahap fondasi/pembelajaran, berjalan dan sudah lolos QA manual (58/64 PASS, 6 temuan lihat §9).
 - Yang **BELUM ada** (rencana fase 1): personas, social accounts, content_posts,
   kalender, session idle-timeout 2 jam, frontend Next.js/FullCalendar, sqlc, Goose.
@@ -84,7 +86,13 @@ MungkasDesk/
 ├── graphify-out/               # knowledge graph project (query sebelum baca kode)
 ├── .gitignore                  # *.exe, backend/.env
 └── backend/
-    ├── cmd/api/main.go         # SELURUH backend ada di sini (single file, by design)
+    ├── cmd/api/
+    │   ├── main.go             # KERANGKA/pusat: connectDB, daftar route, jalankan server, health
+    │   ├── database.go         # var db (pgxpool) + connectDB() — satu-satunya tempat urusan koneksi
+    │   ├── model.go            # struct: User, CreateUserInput, UpdateUserInput, LoginInput
+    │   ├── handlers_users.go   # endpoint CRUD user + soft delete
+    │   ├── handlers_auth.go    # endpoint login
+    │   └── validate.go         # helper validasi: parseUserID, containsUpper, containsSymbol
     ├── db/init_users.sql       # schema tabel users (idempotent, dijalankan manual via psql)
     ├── .env                    # kredensial lokal — GITIGNORED, jangan pernah di-commit
     ├── .env.example            # placeholder DATABASE_URL
@@ -172,7 +180,8 @@ psql -U <user> -d mungkasdesk -f backend/db/init_users.sql
 
 - Komentar **Bahasa Indonesia yang menjelaskan KENAPA** (rasional, trade-off), bukan cuma mengulang sintaks. Ini disengaja karena user sedang belajar kode pelan-pelan — pertahankan gayanya.
 - Header section dalam file: `// ============================================================` + judul section (MODEL, KONEKSI DATABASE, HANDLER, AUTH, MAIN, dll).
-- Tetap **satu file dulu** (`cmd/api/main.go`) sebelum memecah ke struktur folder; pecah hanya kalau memang sudah terasa berat, dan pecahnya mengikuti section yang sudah ada.
+- **Pecah per FILE dalam satu package `main`** (semua di `backend/cmd/api/`, saling bisa manggil tanpa import): `main.go` = kerangka + daftar route (satu-satunya peta endpoint), `database.go` = koneksi, `model.go` = struct, `handlers_users.go` / `handlers_auth.go` = endpoint per domain, `validate.go` = helper validasi. Menambah endpoint = tulis handler di file domain-nya + daftarkan di `main.go`.
+- **Naik ke package/folder baru** (mis. `internal/handler`, `internal/repository`) HANYA kalau file sudah bener banyak dan alasan kuat — pecah file dulu, package menyusul. Jangan lompat struktur besar untuk kepuasan instan.
 - Query selalu berparameter (`$1, $2`), tidak ada string SQL dirakit dari input.
 - Trik SQL yang dipakai: `COALESCE($n, kolom)` untuk partial update; `UPDATE … RETURNING` untuk dapat nilai balik tanpa SELECT kedua.
 
@@ -288,11 +297,11 @@ Skrip tes reusable (dibuat saat QA) juga kemungkinan sudah terhapus:
 
 | Mau… | Sentuh |
 |---|---|
-| Tambah kolom di users | `backend/db/init_users.sql` (idempotent) → jalankan ulang via psql → update SELECT+Scan di main.go |
-| Tambah endpoint | Handler baru di `backend/cmd/api/main.go` + daftarkan route di `main()` (group `api`) |
+| Tambah kolom di users | `backend/db/init_users.sql` (idempotent) → jalankan ulang via psql → update SELECT+Scan di handler (`handlers_users.go` / `handlers_auth.go`) |
+| Tambah endpoint | Handler baru di file domain-nya (`handlers_users.go` / `handlers_auth.go`) + daftarkan route di `main.go` (group `api`) |
 | Perbaiki F1–F9 | Lihat §9; mulai dari F5 (auth) dan F2 (bcrypt 72 byte) kalau mau dampak terbesar |
 | Mulai fase 1 sesungguhnya (personas, content_posts, kalender) | Blueprint lama dihapus dari repo — ambil dari riwayat: `git show f6a8abf:PLAN.md > PLAN.md`; sadari divergensi stack di §1 (bcrypt vs Argon2id, username vs email, SQL manual vs sqlc/Goose): putuskan dulu mau porsi mana yang diadopsi |
-| Paham alur login | `login()` di main.go — 4 langkah: cari user (case-insensitive) → 401 generik → 403 nonaktif → bcrypt → update `last_login_at` |
+| Paham alur login | `login()` di `handlers_auth.go` — 4 langkah: cari user (case-insensitive) → 401 generik → 403 nonaktif → bcrypt → update `last_login_at` |
 | Lanjutkan sesi agent sebelumnya | Dari root repo ini: `opencode -c` (sesi terakhir) atau `opencode -s <sessionID>`; cari ID lewat `opencode session list`. Sesi disimpan di background service — terminal ditutup pun masih bisa dilanjutkan |
 | Restore user terhapus | `UPDATE users SET deleted_at = NULL WHERE id = '<uuid>';` (psql manual, by design tidak ada endpoint-nya) |
 | Push / tag rilis / bikin GitHub Actions | Panggil agent **versioning** (`.opencode/agents/versioning.md`) — dia yang urus commit+hook build/vet, SemVer `vX.Y.Z`, `CHANGELOG.md`, dan workflow di `.github/workflows/` (folder itu belum ada; dibuat saat diminta). Push & `gh release` tetap minta approval |
@@ -312,3 +321,4 @@ Jejak update CONTEXT.md — WAJIB ditambah baris baru di sini tiap task selesai
 | 12 Nov 2026 | Agent ke-4 `versioning` ditambahkan (`.opencode/agents/versioning.md`, mode `all`): pemegang GitHub — commit/push (approval dulu), SemVer tag + `CHANGELOG.md`, workflow GitHub Actions di `.github/` yang belum ada, larangan commit rahasia. `opencode.jsonc` blok AGENTS diperbarui (masih tanpa entri inline — agent tetap Markdown). §3 (4 agent) + baris cepat §12 ditambah | executor |
 | 12 Nov 2026 | Warna agent `versioning` final: **merah `#e5484d`** (percobaan sebelumnya hijau → ungu `#8250df`, keduanya ditolak user) — hanya 1 baris frontmatter, tidak ada logika yang berubah | executor |
 | 12 Nov 2026 | **PLAN.md dihapus dari repo** atas permintaan user (blueprint fase 1; isi masih bisa diambil via `git show f6a8abf:PLAN.md`). Rujukan PLAN.md & TEST-REPORT-API.md dibersihkan di §1, §3, §9, §11, §12 — file QA laporan ternyata juga sudah tidak ada di disk. Semua commit lokal dipush ke `origin/main` (6 commit, pertama kali ke-push selain initial commit) | executor |
+| 12 Nov 2026 | **Refactor struktur backend**: `cmd/api/main.go` (1 file ~705 baris) dipecah jadi 6 file satu package `main` — main.go (kerangka+route+health), database.go, model.go, handlers_users.go, handlers_auth.go, validate.go. Nol perubahan logika; komentar dipindah utuh. Bonus: komentar menyesatkan F7 diperbaiki saat dipindah. Build + vet bersih, smoke test health/users 200, graphify diupdate (43 nodes/64 edges). Konvensi §6 diubah: pecah per file dulu, package baru menyusul | executor |

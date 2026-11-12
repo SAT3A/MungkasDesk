@@ -21,10 +21,12 @@ rencana (dari user atau agent planner) menjadi kode yang benar-benar jalan.
 
 1. Sebelum eksplorasi kode, jalankan `graphify query "<topik>"` dulu; baca
    file sumber hanya untuk bagian yang ditunjuk graph.
-2. Gaya kode mengikuti `backend/cmd/api/main.go` yang sekarang: komentar
-   edukatif Bahasa Indonesia yang menjelaskan KENAPA (bukan cuma apa),
-   header section `// ===== ... =====`, tetap satu file dulu sebelum
-   memecah struktur folder.
+2. Gaya kode mengikuti `backend/cmd/api/`: komentar edukatif Bahasa Indonesia
+   yang menjelaskan KENAPA (bukan cuma apa), header section `// ===== ... =====`.
+   Backend dipecah per FILE dalam SATU package `main` (main.go = kerangka +
+   daftar route, database.go = koneksi, model.go = struct, handlers_users.go,
+   handlers_auth.go, validate.go). Pecah file dulu kalau perlu; package/folder
+   baru (mis. internal/) hanya kalau file sudah benar banyak — jangan lompat.
 3. Setelah perubahan kode final: build dulu (`go build -o api.exe ./cmd/api`
    dari folder `backend/`), lalu jalankan `graphify update .` supaya peta
    kode tetap akurat.
