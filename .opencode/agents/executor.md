@@ -44,6 +44,13 @@ rencana (dari user atau agent planner) menjadi kode yang benar-benar jalan.
    tanya — jangan menebak.
 9. Dilarang keras: hardcode secret, SQL penghapus data dari kode aplikasi,
    atau perubahan schema yang menghapus data tanpa diminta eksplisit.
+10. Tiap kali task SELESAI: WAJIB update `CONTEXT.md` (dokumen handover di
+    root repo) — tulis perubahan yang terjadi ke bagian yang relevan; kalau
+    tidak ada bagian lain yang berubah, cukup tambah 1 baris di Changelog
+    (§13 CONTEXT.md) + perbarui tanggal di atasnya. Di laporan akhir WAJIB
+    menyebut bahwa CONTEXT.md sudah di-update (sebut bagiannya). Tidak
+    menyebut = task dianggap belum selesai. Aturan yang sama berlaku untuk
+    agent lain via `instructions` di opencode.jsonc yang memuat CONTEXT.md.
 
 Di akhir pekerjaan, jelaskan konsep baru yang muncul (user sedang belajar
 kode pelan-pelan). Laporan dalam Bahasa Indonesia.

@@ -3,8 +3,27 @@
 > Dokumen "otak project". Target pembaca: coding agent / developer lain yang perlu kerja di
 > repo ini **tanpa harus baca semua kode dari nol**. Ibarat handover ke tim IT berikutnya.
 >
-> Terakhir diperbarui: **12 November 2026** (setelah QA API 64 kasus).
+> Terakhir diperbarui: **12 November 2026** (setelah QA API 64 kasus; aturan wajib update §0 ditambahkan).
 > Kalau ada perubahan besar di kode, perbarui dokumen ini juga — dokumen basi lebih bahaya daripada tidak ada.
+
+---
+
+## 0. ATURAN WAJIB — update dokumen ini tiap akhir task
+
+Bukan saran; ini aturan project yang ditegakkan lewat `instructions` di `opencode.jsonc`
+(dokumen ini di-load OpenCode sebagai instruksi untuk SEMUA agent tiap sesi) dan
+aturan #10 di `.opencode/agents/executor.md`. Berlaku untuk setiap agent yang
+selesai menjalankan task di repo ini:
+
+1. **Update `CONTEXT.md`** sesuai perubahan yang terjadi — perbarui bagian/section yang kena.
+2. Kalau tidak ada bagian lain yang berubah (task kecil, config, dokumentasi),
+   cukup tambahkan 1 baris di **§13 Changelog** dan perbarui tanggal
+   "Terakhir diperbarui" di atas.
+3. **Sebut di laporan akhir**: "CONTEXT.md sudah di-update (§X)". Tidak menyebut =
+   task dianggap BELUM selesai.
+
+Alasannya: dokumen ini satu-satunya peta cepat untuk agent berikutnya. Dokumen basi
+= agent berikutnya kerja dengan peta salah, lebih bahaya daripada tidak ada peta.
 
 ---
 
@@ -61,7 +80,7 @@ MungkasDesk/
 ├── PLAN.md                     # blueprint aplikasi lengkap fase 1 (belum diimplementasi)
 ├── TEST-REPORT-API.md          # hasil QA manual 64 kasus, 12 Nov 2026 (BELUM di-commit)
 ├── AGENTS.md                   # aturan graphify + panduan sesi (dibaca agent)
-├── opencode.jsonc, .opencode/  # config OpenCode + 3 agent custom: planner/executor/testing
+├── opencode.jsonc, .opencode/  # config OpenCode; CONTEXT.md di-load via "instructions" + 3 agent custom: planner/executor/testing
 ├── graphify-out/               # knowledge graph project (query sebelum baca kode)
 ├── .gitignore                  # *.exe, backend/.env
 └── backend/
@@ -249,6 +268,8 @@ Skrip tes reusable (dibuat saat QA, ada di temp folder, bisa sudah terhapus):
 9. Dilarang keras: hardcode secret, SQL penghapus data dari kode aplikasi, perubahan schema
    yang menghapus data tanpa diminta eksplisit.
 10. Temuan baru yang sudah diverifikasi → simpan via `graphify save-result --question "..." --answer "..." --nodes "..." --outcome useful`, lalu `graphify reflect --graph graphify-out/graph.json`.
+11. **Tiap akhir task: update CONTEXT.md** (detail + alasan di §0) — dan WAJIB menyebut
+    di laporan akhir bahwa CONTEXT.md sudah di-update, sebut bagiannya.
 
 ---
 
@@ -272,3 +293,15 @@ Skrip tes reusable (dibuat saat QA, ada di temp folder, bisa sudah terhapus):
 | Mulai fase 1 sesungguhnya (personas, content_posts, kalender) | Ikuti `PLAN.md` — tapi sadari divergensi stack di §1 (bcrypt vs Argon2id, username vs email, SQL manual vs sqlc/Goose): putuskan dulu mau porsi mana yang diadopsi |
 | Paham alur login | `login()` di main.go — 4 langkah: cari user (case-insensitive) → 401 generik → 403 nonaktif → bcrypt → update `last_login_at` |
 | Restore user terhapus | `UPDATE users SET deleted_at = NULL WHERE id = '<uuid>';` (psql manual, by design tidak ada endpoint-nya) |
+
+---
+
+## 13. Changelog dokumen
+
+Jejak update CONTEXT.md — WAJIB ditambah baris baru di sini tiap task selesai
+(lihat §0), minimal 1 baris.
+
+| Tanggal | Perubahan | Agent |
+|---|---|---|
+| 12 Nov 2026 | Dokumen dibuat (handover pertama: status, API, schema, konvensi, backlog QA F1–F9, aturan agent) | executor |
+| 12 Nov 2026 | Aturan wajib update dokumen ditambahkan: §0 (hukum tiap akhir task), §10 item 11, §13 Changelog ini. `opencode.jsonc` sekarang memuat CONTEXT.md sebagai `instructions` (kebukti live: CONTEXT.md ke-inject tanpa restart); aturan #10 ditambahkan di `.opencode/agents/executor.md` | executor |

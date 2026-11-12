@@ -14,6 +14,16 @@
 
   "model": "bansos-ai/codingforFree",
 
+  // ============================================================
+  // INSTRUCTIONS — CONTEXT.md dimuat sebagai instruksi project untuk
+  // SEMUA agent (bareng AGENTS.md yang sudah di-discovery otomatis).
+  // CONTEXT.md = handover doc: status project, konvensi, backlog QA,
+  // dan ATURAN WAJIB (mis. tiap akhir task agent wajib update
+  // CONTEXT.md dan menyebutnya di laporan). Dengan begini aturan itu
+  // terbaca tiap sesi tanpa perlu baca semua kode dulu.
+  // ============================================================
+  "instructions": ["CONTEXT.md"],
+
   "permissions": [
     {
       "action": "external_directory",
