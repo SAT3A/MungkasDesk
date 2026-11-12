@@ -38,11 +38,13 @@ yang sudah diterbitkan manual. Satu pengguna (pemilik aplikasi), tidak ada regis
 - Yang **SUDAH ada**: satu REST API Go/Gin untuk **manajemen user** (CRUD + soft delete + login),
   seluruhnya di **satu file** `backend/cmd/api/main.go` (~705 baris) + **satu tabel** `users` di PostgreSQL.
   Tahap fondasi/pembelajaran, berjalan dan sudah lolos QA manual (58/64 PASS, 6 temuan lihat §9).
-- Yang **BELUM ada** (seluruh isi `PLAN.md`): personas, social accounts, content_posts,
+- Yang **BELUM ada** (rencana fase 1): personas, social accounts, content_posts,
   kalender, session idle-timeout 2 jam, frontend Next.js/FullCalendar, sqlc, Goose.
-  `PLAN.md` = **blueprint masa depan**, bukan deskripsi kode sekarang.
-- **Jangan asumsikan schema di PLAN.md sama dengan database sekarang.** Divergensi penting:
-  | Hal | PLAN.md (rencana) | Kode sekarang (aktif) |
+  Blueprint aslinya (`PLAN.md`, 453 baris) sudah **DIHAPUS dari repo 12 Nov 2026**
+  atas permintaan user; isi lengkapnya masih bisa diambil dari riwayat git:
+  `git show f6a8abf:PLAN.md > PLAN.md`.
+- **Jangan asumsikan schema blueprint lama sama dengan database sekarang.** Divergensi penting:
+  | Hal | Blueprint lama (dihapus) | Kode sekarang (aktif) |
   |---|---|---|
   | Identitas login | `email` + `display_name` | `username` |
   | Hash password | Argon2id | **bcrypt** (`golang.org/x/crypto/bcrypt`) |
@@ -77,8 +79,6 @@ kosmetik saja; `go mod tidy` akan memindahkannya ke blok direct.
 ```text
 MungkasDesk/
 ├── CONTEXT.md                  # dokumen ini
-├── PLAN.md                     # blueprint aplikasi lengkap fase 1 (belum diimplementasi)
-├── TEST-REPORT-API.md          # hasil QA manual 64 kasus, 12 Nov 2026 (BELUM di-commit)
 ├── AGENTS.md                   # aturan graphify + panduan sesi (dibaca agent)
 ├── opencode.jsonc, .opencode/  # config OpenCode; CONTEXT.md di-load via "instructions" + 4 agent custom: planner/executor/testing/versioning
 ├── graphify-out/               # knowledge graph project (query sebelum baca kode)
@@ -221,7 +221,7 @@ go build -o api.exe ./cmd/api
 
 ---
 
-## 9. Backlog: temuan QA terbuka (12 Nov 2026, dari TEST-REPORT-API.md)
+## 9. Backlog: temuan QA terbuka (12 Nov 2026)
 
 Hasil: 58 PASS / 6 FAIL / 64 kasus. Semua FAIL = temuan perancangan, bukan crash.
 JANGAN di-rediscover — ini daftarnya:
@@ -232,14 +232,15 @@ JANGAN di-rediscover — ini daftarnya:
 | **F2** | Password > 72 byte → **500** (bukan 400): `bcrypt.GenerateFromPassword` mengembalikan `ErrPasswordTooLong`, dan validasi create tidak punya batas panjang | Validasi `len(password) <= 72` → 400 dengan pesan jelas |
 | **F3** | Content-Type tidak divalidasi — JSON valid dengan header `text/plain` tetap diproses 201 | Standar: tolak dengan 415, atau minimal dokumentasikan perilaku permissive ini |
 | **F4** | Method salah (mis. `PUT /users`) dibalas 404, bukan 405 | Set `router.HandleMethodNotAllowed = true` |
-| **F5** | **Tidak ada autentikasi/otorisasi di SEMUA endpoint** — CRUD user terbuka penuh. Paling besar di backlog; ini sejalan dengan rencana session di PLAN.md §13 | Implementasi session cookie + tabel `user_sessions` (idle 2 jam) sesuai PLAN.md |
+| **F5** | **Tidak ada autentikasi/otorisasi di SEMUA endpoint** — CRUD user terbuka penuh. Paling besar di backlog; ini sejalan dengan rencana session di blueprint lama (§13-nya) | Implementasi session cookie + tabel `user_sessions` (idle 2 jam) sesuai blueprint lama |
 | **F6** | Login user nonaktif + password salah tetap 403 → bocor keberadaan akun (by design, tapi perlu disadari) | Trade-off sadar; revisi kalau mau lebih strict |
 | **F7** | Komentar main.go ~baris 311-313 menyesatkan: klaim update username ke nilai sendiri akan kena 23505 — faktanya PostgreSQL tidak konflik dengan baris sendiri (terbukti P9/P15 = 200). Perilaku KODE-nya benar, komentarnya yang perlu dikoreksi | Perbaiki komentar |
 | **F8** | Error format tidak konsisten: error bisnis JSON envelope, tapi 404 route Gin plain text | Tambah fallback handler JSON |
 | **F9** | Observasi minor: `GET /users` tanpa pagination (semua baris sekaligus); trailing slash `/users/` auto-redirect 200 | Tambah pagination saat data tumbuh |
 
-Detail lengkap + bukti DB per kasus: `TEST-REPORT-API.md`.
-Skrip tes reusable (dibuat saat QA, ada di temp folder, bisa sudah terhapus):
+Laporan lengkap aslinya (`TEST-REPORT-API.md`) sudah TIDAK ADA di disk — terhapus
+setelah QA selesai; ringkasan F1–F9 di atas adalah satu-satunya catatan yang tersisa.
+Skrip tes reusable (dibuat saat QA) juga kemungkinan sudah terhapus:
 `C:\Users\irvansah.pamungkas\AppData\Local\Temp\opencode\qa_api_tests.ps1`.
 
 ---
@@ -276,10 +277,10 @@ Skrip tes reusable (dibuat saat QA, ada di temp folder, bisa sudah terhapus):
 ## 11. Gotcha environment (Windows / PowerShell 5.1)
 
 - Shell adalah **Windows PowerShell**; error body dari `Invoke-WebRequest` perlu cara baca
-  khusus (lihat LESSONS.md / TEST-REPORT-API.md metode QA).
+  khusus (lihat LESSONS.md metode QA).
 - `api.exe` adalah build artifact, gitignored (`*.exe`); build ulang kalau hilang.
 - Repo path mengandung **spasi** (`C:\Satria Punya\MungkasDesk`) — selalu quote path di shell.
-- `TEST-REPORT-API.md` masih untracked; keputusan commit-nya milik user.
+- File QA besar sudah hilang dari disk; kalau butuh bukti detail, jalankan ulang QA.
 
 ---
 
@@ -290,7 +291,7 @@ Skrip tes reusable (dibuat saat QA, ada di temp folder, bisa sudah terhapus):
 | Tambah kolom di users | `backend/db/init_users.sql` (idempotent) → jalankan ulang via psql → update SELECT+Scan di main.go |
 | Tambah endpoint | Handler baru di `backend/cmd/api/main.go` + daftarkan route di `main()` (group `api`) |
 | Perbaiki F1–F9 | Lihat §9; mulai dari F5 (auth) dan F2 (bcrypt 72 byte) kalau mau dampak terbesar |
-| Mulai fase 1 sesungguhnya (personas, content_posts, kalender) | Ikuti `PLAN.md` — tapi sadari divergensi stack di §1 (bcrypt vs Argon2id, username vs email, SQL manual vs sqlc/Goose): putuskan dulu mau porsi mana yang diadopsi |
+| Mulai fase 1 sesungguhnya (personas, content_posts, kalender) | Blueprint lama dihapus dari repo — ambil dari riwayat: `git show f6a8abf:PLAN.md > PLAN.md`; sadari divergensi stack di §1 (bcrypt vs Argon2id, username vs email, SQL manual vs sqlc/Goose): putuskan dulu mau porsi mana yang diadopsi |
 | Paham alur login | `login()` di main.go — 4 langkah: cari user (case-insensitive) → 401 generik → 403 nonaktif → bcrypt → update `last_login_at` |
 | Lanjutkan sesi agent sebelumnya | Dari root repo ini: `opencode -c` (sesi terakhir) atau `opencode -s <sessionID>`; cari ID lewat `opencode session list`. Sesi disimpan di background service — terminal ditutup pun masih bisa dilanjutkan |
 | Restore user terhapus | `UPDATE users SET deleted_at = NULL WHERE id = '<uuid>';` (psql manual, by design tidak ada endpoint-nya) |
@@ -310,3 +311,4 @@ Jejak update CONTEXT.md — WAJIB ditambah baris baru di sini tiap task selesai
 | 12 Nov 2026 | Tambah baris §12: cara lanjutkan session sebelumnya (`opencode -c` / `opencode -s <sessionID>`, daftar ID via `opencode session list`) — dari pertanyaan user, tidak ada kode yang diubah | executor |
 | 12 Nov 2026 | Agent ke-4 `versioning` ditambahkan (`.opencode/agents/versioning.md`, mode `all`): pemegang GitHub — commit/push (approval dulu), SemVer tag + `CHANGELOG.md`, workflow GitHub Actions di `.github/` yang belum ada, larangan commit rahasia. `opencode.jsonc` blok AGENTS diperbarui (masih tanpa entri inline — agent tetap Markdown). §3 (4 agent) + baris cepat §12 ditambah | executor |
 | 12 Nov 2026 | Warna agent `versioning` final: **merah `#e5484d`** (percobaan sebelumnya hijau → ungu `#8250df`, keduanya ditolak user) — hanya 1 baris frontmatter, tidak ada logika yang berubah | executor |
+| 12 Nov 2026 | **PLAN.md dihapus dari repo** atas permintaan user (blueprint fase 1; isi masih bisa diambil via `git show f6a8abf:PLAN.md`). Rujukan PLAN.md & TEST-REPORT-API.md dibersihkan di §1, §3, §9, §11, §12 — file QA laporan ternyata juga sudah tidak ada di disk. Semua commit lokal dipush ke `origin/main` (6 commit, pertama kali ke-push selain initial commit) | executor |
