@@ -3,7 +3,7 @@
 > Dokumen "otak project". Target pembaca: coding agent / developer lain yang perlu kerja di
 > repo ini **tanpa harus baca semua kode dari nol**. Ibarat handover ke tim IT berikutnya.
 >
-> Terakhir diperbarui: **12 November 2026** (setelah QA API 64 kasus; aturan wajib update §0 ditambahkan).
+> Terakhir diperbarui: **12 November 2026** (agent `versioning` ditambahkan untuk urusan GitHub: push, tag/rilis, CHANGELOG, GitHub Actions).
 > Kalau ada perubahan besar di kode, perbarui dokumen ini juga — dokumen basi lebih bahaya daripada tidak ada.
 
 ---
@@ -80,7 +80,7 @@ MungkasDesk/
 ├── PLAN.md                     # blueprint aplikasi lengkap fase 1 (belum diimplementasi)
 ├── TEST-REPORT-API.md          # hasil QA manual 64 kasus, 12 Nov 2026 (BELUM di-commit)
 ├── AGENTS.md                   # aturan graphify + panduan sesi (dibaca agent)
-├── opencode.jsonc, .opencode/  # config OpenCode; CONTEXT.md di-load via "instructions" + 3 agent custom: planner/executor/testing
+├── opencode.jsonc, .opencode/  # config OpenCode; CONTEXT.md di-load via "instructions" + 4 agent custom: planner/executor/testing/versioning
 ├── graphify-out/               # knowledge graph project (query sebelum baca kode)
 ├── .gitignore                  # *.exe, backend/.env
 └── backend/
@@ -294,6 +294,7 @@ Skrip tes reusable (dibuat saat QA, ada di temp folder, bisa sudah terhapus):
 | Paham alur login | `login()` di main.go — 4 langkah: cari user (case-insensitive) → 401 generik → 403 nonaktif → bcrypt → update `last_login_at` |
 | Lanjutkan sesi agent sebelumnya | Dari root repo ini: `opencode -c` (sesi terakhir) atau `opencode -s <sessionID>`; cari ID lewat `opencode session list`. Sesi disimpan di background service — terminal ditutup pun masih bisa dilanjutkan |
 | Restore user terhapus | `UPDATE users SET deleted_at = NULL WHERE id = '<uuid>';` (psql manual, by design tidak ada endpoint-nya) |
+| Push / tag rilis / bikin GitHub Actions | Panggil agent **versioning** (`.opencode/agents/versioning.md`) — dia yang urus commit+hook build/vet, SemVer `vX.Y.Z`, `CHANGELOG.md`, dan workflow di `.github/workflows/` (folder itu belum ada; dibuat saat diminta). Push & `gh release` tetap minta approval |
 
 ---
 
@@ -307,3 +308,5 @@ Jejak update CONTEXT.md — WAJIB ditambah baris baru di sini tiap task selesai
 | 12 Nov 2026 | Dokumen dibuat (handover pertama: status, API, schema, konvensi, backlog QA F1–F9, aturan agent) | executor |
 | 12 Nov 2026 | Aturan wajib update dokumen ditambahkan: §0 (hukum tiap akhir task), §10 item 11, §13 Changelog ini. `opencode.jsonc` sekarang memuat CONTEXT.md sebagai `instructions` (kebukti live: CONTEXT.md ke-inject tanpa restart); aturan #10 ditambahkan di `.opencode/agents/executor.md` | executor |
 | 12 Nov 2026 | Tambah baris §12: cara lanjutkan session sebelumnya (`opencode -c` / `opencode -s <sessionID>`, daftar ID via `opencode session list`) — dari pertanyaan user, tidak ada kode yang diubah | executor |
+| 12 Nov 2026 | Agent ke-4 `versioning` ditambahkan (`.opencode/agents/versioning.md`, mode `all`): pemegang GitHub — commit/push (approval dulu), SemVer tag + `CHANGELOG.md`, workflow GitHub Actions di `.github/` yang belum ada, larangan commit rahasia. `opencode.jsonc` blok AGENTS diperbarui (masih tanpa entri inline — agent tetap Markdown). §3 (4 agent) + baris cepat §12 ditambah | executor |
+| 12 Nov 2026 | Warna agent `versioning` final: **merah `#e5484d`** (percobaan sebelumnya hijau → ungu `#8250df`, keduanya ditolak user) — hanya 1 baris frontmatter, tidak ada logika yang berubah | executor |

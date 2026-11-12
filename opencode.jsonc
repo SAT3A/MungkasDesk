@@ -38,9 +38,14 @@
 
   // ============================================================
   // AGENTS
-  // planner / executor / testing didefinisikan sebagai Markdown agent
-  // di .opencode/agents/ (planner.md, executor.md, testing.md) — masing-masing
-  // mode "all": bisa dipanggil sebagai subagent atau dipilih langsung (Tab).
+  // planner / executor / testing / versioning didefinisikan sebagai Markdown
+  // agent di .opencode/agents/ (planner.md, executor.md, testing.md,
+  // versioning.md) — masing-masing mode "all": bisa dipanggil sebagai
+  // subagent atau dipilih langsung (Tab).
+  //
+  // versioning = pemegang sisi GitHub: commit, push (selalu minta approval),
+  // tag/rilis SemVer, CHANGELOG, dan workflow GitHub Actions (folder .github/
+  // belum ada — dibuat oleh agent ini saat diminta).
   // ============================================================
   "agents": {
   }
