@@ -1,26 +1,68 @@
 {
   "backend/cmd/api/main.go": {
-    "mtime": 1794382190.6182275,
-    "seen": 1794382601.9213524,
-    "ast_hash": "eb2ec8a3511b78db34984b32b244e912",
+    "mtime": 1794386230.8495853,
+    "seen": 1794460797.1134026,
+    "ast_hash": "192c862f14237e390374c00fc3a381a9",
     "semantic_hash": ""
   },
   "backend/go.mod": {
-    "mtime": 1794212913.3788426,
-    "seen": 1794382075.6659064,
-    "ast_hash": "cfb0fd7d5073fc1d48e33aa25842c78a",
-    "semantic_hash": "cfb0fd7d5073fc1d48e33aa25842c78a"
+    "mtime": 1794386207.5474265,
+    "seen": 1794460797.1134026,
+    "ast_hash": "c5a5f10ecc9c83675451568779f29554",
+    "semantic_hash": ""
   },
   "AGENTS.md": {
-    "mtime": 1794382040.2913733,
-    "seen": 1794382601.9213524,
-    "ast_hash": "f36539ecc9af68f33ebd72770ce4a19e",
+    "mtime": 1794382656.6017213,
+    "seen": 1794460797.1134026,
+    "ast_hash": "b85dce2308440d6a5f9ad47333175ed8",
     "semantic_hash": ""
   },
   "PLAN.md": {
     "mtime": 1794198605.461971,
     "seen": 1794382601.9213524,
     "ast_hash": "17eb1f773c03f9d94c1686e87a7fa9f0",
+    "semantic_hash": ""
+  },
+  ".opencode/agents/executor.md": {
+    "mtime": 1794388297.87911,
+    "seen": 1794460797.1134026,
+    "ast_hash": "0c1e42f8d6dd19a7a05483a31ce867eb",
+    "semantic_hash": ""
+  },
+  ".opencode/agents/planner.md": {
+    "mtime": 1794388297.8803616,
+    "seen": 1794460797.1134026,
+    "ast_hash": "719c9f846024f4fd8ccbfb06cf3df84b",
+    "semantic_hash": ""
+  },
+  ".opencode/agents/testing.md": {
+    "mtime": 1794388297.87911,
+    "seen": 1794460797.1134026,
+    "ast_hash": "4395bb56cf63d0ec93bafa208aa38379",
+    "semantic_hash": ""
+  },
+  "CONTEXT.md": {
+    "mtime": 1794460733.626521,
+    "seen": 1794460797.1134026,
+    "ast_hash": "d7ba949c10da17fd5ecf09ec9300dd07",
+    "semantic_hash": ""
+  },
+  "TEST-REPORT-API.md": {
+    "mtime": 1794460055.7106397,
+    "seen": 1794460797.1145182,
+    "ast_hash": "efe0af0160657e4f7e103620532fbb49",
+    "semantic_hash": ""
+  },
+  "graphify-out/memory/query_20261111_073654_bfde5623_bagaimana_cara_apply_perubahan_schema_database_di.md": {
+    "mtime": 1794382614.4188294,
+    "seen": 1794460797.1145182,
+    "ast_hash": "20d10b38193a7a0c3e3f94df651592ca",
+    "semantic_hash": ""
+  },
+  "graphify-out/memory/query_20261111_073703_ce9a34b5_bagaimana_membaca_body_respons_error__4xx__dari_in.md": {
+    "mtime": 1794382623.2385283,
+    "seen": 1794460797.115101,
+    "ast_hash": "0c43d0493e94f61a0036d90777e71208",
     "semantic_hash": ""
   }
 }
