@@ -292,6 +292,7 @@ Skrip tes reusable (dibuat saat QA, ada di temp folder, bisa sudah terhapus):
 | Perbaiki F1–F9 | Lihat §9; mulai dari F5 (auth) dan F2 (bcrypt 72 byte) kalau mau dampak terbesar |
 | Mulai fase 1 sesungguhnya (personas, content_posts, kalender) | Ikuti `PLAN.md` — tapi sadari divergensi stack di §1 (bcrypt vs Argon2id, username vs email, SQL manual vs sqlc/Goose): putuskan dulu mau porsi mana yang diadopsi |
 | Paham alur login | `login()` di main.go — 4 langkah: cari user (case-insensitive) → 401 generik → 403 nonaktif → bcrypt → update `last_login_at` |
+| Lanjutkan sesi agent sebelumnya | Dari root repo ini: `opencode -c` (sesi terakhir) atau `opencode -s <sessionID>`; cari ID lewat `opencode session list`. Sesi disimpan di background service — terminal ditutup pun masih bisa dilanjutkan |
 | Restore user terhapus | `UPDATE users SET deleted_at = NULL WHERE id = '<uuid>';` (psql manual, by design tidak ada endpoint-nya) |
 
 ---
@@ -305,3 +306,4 @@ Jejak update CONTEXT.md — WAJIB ditambah baris baru di sini tiap task selesai
 |---|---|---|
 | 12 Nov 2026 | Dokumen dibuat (handover pertama: status, API, schema, konvensi, backlog QA F1–F9, aturan agent) | executor |
 | 12 Nov 2026 | Aturan wajib update dokumen ditambahkan: §0 (hukum tiap akhir task), §10 item 11, §13 Changelog ini. `opencode.jsonc` sekarang memuat CONTEXT.md sebagai `instructions` (kebukti live: CONTEXT.md ke-inject tanpa restart); aturan #10 ditambahkan di `.opencode/agents/executor.md` | executor |
+| 12 Nov 2026 | Tambah baris §12: cara lanjutkan session sebelumnya (`opencode -c` / `opencode -s <sessionID>`, daftar ID via `opencode session list`) — dari pertanyaan user, tidak ada kode yang diubah | executor |
