@@ -1,6 +1,12 @@
 # Build artifacts
 *.exe
 
+# Dependency skill playwright-skill (di-install lokal via npm run setup)
+.agents/skills/*/node_modules/
+
+# Artefak runtime MCP playwright (snapshot otomatis; laporan resmi taruh di reports/)
+.playwright-mcp/
+
 # Kredensial lokal (lihat backend/.env.example)
 backend/.env
 

@@ -37,6 +37,30 @@
   },
 
   // ============================================================
+  // MCP SERVERS
+  // playwright = server resmi dari https://github.com/microsoft/playwright-mcp
+  // Dipasang sesuai README-nya sebagai package npm @playwright/mcp via npx
+  // (bukan clone repo — ini cara instal standarnya, jadi tidak ada folder
+  // vendor di repo ini).
+  //   --headless : browser tidak muncul di layar saat agent testing jalan
+  //   --isolated : profil browser per sesi dibuang saat sesi ditutup, supaya
+  //                tiap run testing mulai dari kondisi bersih (reproducible)
+  // Hapus kedua flag itu di args kalau ingin melihat browser bergerak /
+  // menyimpan state login antar sesi.
+  // Dipakai utamanya oleh agent testing (.opencode/agents/testing.md) untuk
+  // testing UI/E2E frontend (fase 1, Next.js) + pengambilan screenshot
+  // untuk laporan HTML-nya.
+  // ============================================================
+  "mcp": {
+    "servers": {
+      "playwright": {
+        "type": "local",
+        "command": ["npx", "-y", "@playwright/mcp@latest", "--headless", "--isolated"]
+      }
+    }
+  },
+
+  // ============================================================
   // AGENTS
   // planner / executor / testing / versioning didefinisikan sebagai Markdown
   // agent di .opencode/agents/ (planner.md, executor.md, testing.md,
