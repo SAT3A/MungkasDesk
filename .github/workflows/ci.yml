@@ -1,0 +1,50 @@
+# CI MungkasDesk — "robot pemeriksa" yang jalan di server GitHub setiap ada push/PR.
+#
+# Kenapa ada:
+# - Build & vet yang selama ini manual di laptop jadi otomatis terverifikasi
+#   di tiap commit; commit yang merusak build ketahuan dalam ~30 detik.
+# - go test menjalankan semua test Go (saat ini belum ada file test, jadi
+#   lolos dengan "no test files" — step tetap dipasang supaya test yang
+#   ditambahkan nanti otomatis tertangkap).
+#
+# Catatan desain:
+# - Repo publik -> GitHub Actions gratis, tanpa kuota menit.
+# - CI TIDAK punya backend/.env — aman, karena connectDB() hanya dipanggil
+#   saat runtime, bukan saat vet/build/test.
+# - working-directory backend + go-version-file backend/go.mod supaya versi
+#   Go runner selalu mengikuti go.mod (tidak di-hardcode).
+# - permissions contents: read = least privilege; workflow ini hanya baca
+#   kode, tidak menulis apa pun ke repo.
+
+name: CI
+
+on:
+  push:
+    branches: [main, Dev]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: backend/go.mod
+          cache-dependency-path: backend/go.sum
+
+      - name: go vet
+        run: go vet ./...
+
+      - name: go test
+        run: go test ./...
+
+      - name: go build
+        run: go build ./...
