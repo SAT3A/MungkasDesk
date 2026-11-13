@@ -3,7 +3,7 @@
 > Dokumen "otak project". Target pembaca: coding agent / developer lain yang perlu kerja di
 > repo ini **tanpa harus baca semua kode dari nol**. Ibarat handover ke tim IT berikutnya.
 >
-> Terakhir diperbarui: **13 November 2026** (endpoint DELETE user DIHAPUS dari API; jalur "matikan user" kini PATCH `is_active: false`, soft delete hanya via psql manual).
+> Terakhir diperbarui: **13 November 2026** (CI GitHub Actions aktif: `.github/workflows/ci.yml` — vet/test/build Go; branch **Dev** dibuat dari main. Endpoint DELETE user sudah dihapus — jalur "matikan user" kini PATCH `is_active: false`, soft delete hanya via psql manual).
 > Kalau ada perubahan besar di kode, perbarui dokumen ini juga — dokumen basi lebih bahaya daripada tidak ada.
 
 ---
@@ -82,6 +82,7 @@ kosmetik saja; `go mod tidy` akan memindahkannya ke blok direct.
 MungkasDesk/
 ├── CONTEXT.md                  # dokumen ini
 ├── AGENTS.md                   # aturan graphify + panduan sesi (dibaca agent)
+├── .github/workflows/ci.yml    # CI GitHub Actions: go vet/test/build (push main & Dev + PR)
 ├── opencode.jsonc, .opencode/  # config OpenCode; CONTEXT.md di-load via "instructions" + 4 agent custom: planner/executor/testing/versioning + MCP server "playwright"
 ├── .agents/
 │   └── skills/playwright-skill/  # skill browser automation (lackeyjb, npm-installable; dependensi via npm run setup di folder itu — node_modules di-gitignore)
@@ -312,7 +313,7 @@ Skrip tes reusable (dibuat saat QA) juga kemungkinan sudah terhapus:
 | Lanjutkan sesi agent sebelumnya | Dari root repo ini: `opencode -c` (sesi terakhir) atau `opencode -s <sessionID>`; cari ID lewat `opencode session list`. Sesi disimpan di background service — terminal ditutup pun masih bisa dilanjutkan |
 | Restore user terhapus | `UPDATE users SET deleted_at = NULL WHERE id = '<uuid>';` (psql manual). Menghapus juga kini hanya via psql (`UPDATE ... SET deleted_at = now()`) — endpoint DELETE sudah dihapus 13 Nov 2026 |
 | Testing via browser (UI/E2E) | Agent `testing` — MCP `playwright` untuk kontrol interaktif (Code Mode: `tools.playwright.*`), skill `playwright-skill` untuk script reusable (script disimpan di `reports/scripts/`, bukan folder temp). WAJIB diakhiri laporan `reports/TEST-REPORT-*.html` |
-| Push / tag rilis / bikin GitHub Actions | Panggil agent **versioning** (`.opencode/agents/versioning.md`) — dia yang urus commit+hook build/vet, SemVer `vX.Y.Z`, `CHANGELOG.md`, dan workflow di `.github/workflows/` (folder itu belum ada; dibuat saat diminta). Push & `gh release` tetap minta approval |
+| Push / tag rilis / bikin GitHub Actions | Panggil agent **versioning** (`.opencode/agents/versioning.md`) — dia yang urus commit+hook build/vet, SemVer `vX.Y.Z`, `CHANGELOG.md`, dan workflow di `.github/workflows/` (file aktif saat ini: `ci.yml`, dibuat 13 Nov 2026 — trigger push main & Dev + PR). Push & `gh release` tetap minta approval |
 
 ---
 
@@ -332,3 +333,4 @@ Jejak update CONTEXT.md — WAJIB ditambah baris baru di sini tiap task selesai
 | 12 Nov 2026 | **Refactor struktur backend**: `cmd/api/main.go` (1 file ~705 baris) dipecah jadi 6 file satu package `main` — main.go (kerangka+route+health), database.go, model.go, handlers_users.go, handlers_auth.go, validate.go. Nol perubahan logika; komentar dipindah utuh. Bonus: komentar menyesatkan F7 diperbaiki saat dipindah. Build + vet bersih, smoke test health/users 200, graphify diupdate (43 nodes/64 edges). Konvensi §6 diubah: pecah per file dulu, package baru menyusul | executor |
 | 13 Nov 2026 | **Infra testing Playwright**: (1) MCP server `playwright` dari microsoft/playwright-mcp dipasang project-local di `opencode.jsonc` — package npm `@playwright/mcp` via npx (bukan clone repo), flags `--headless --isolated`, terverifikasi `opencode mcp list` = connected; (2) skill `playwright-skill` (lackeyjb v5.0.0) dipasang via CLI `npx skills add --agent opencode` → `.agents/skills/playwright-skill/`, dependensi playwright+chromium via `npm run setup` di folder skill (node_modules di-gitignore); (3) agent `testing.md` dirombak: dua mode Playwright (MCP interaktif vs skill script reusable di `reports/scripts/`), izin edit di-scope `reports/*` (deny `*` dulu lalu allow `reports/*` — last match wins), WAJIB generate `reports/TEST-REPORT-*.html` self-contained (CSS inline, tanpa kredensial) tiap akhir sesi test. Struktur §3 + baris §12 + .gitignore ikut diperbarui | executor |
 | 13 Nov 2026 | **Endpoint DELETE user dihapus dari API** (permintaan user): route `DELETE /api/v1/users/:id` dicabut dari main.go, handler `softDeleteUser` dihapus dari handlers_users.go (~53 baris). Kolom `deleted_at` + filter `deleted_at IS NULL` di SEMUA query tetap dipertahankan (soft delete kini hanya via psql manual); jalur API "mematikan" user = PATCH `{is_active: false}`. Build + vet bersih, smoke test: DELETE → 404, health → 200. Tabel endpoint §4, §5, §8.1, baris §12 ikut diperbarui; handler tinggal 4 (getUsers, getUserByID, updateUser, createUser) | executor |
+| 13 Nov 2026 | **CI GitHub Actions + branch Dev** (versioning): `.github/workflows/ci.yml` dibuat — trigger push ke `main` & `Dev` + `pull_request`; job build runner ubuntu: `go vet` / `go test` / `go build`, `working-directory: backend`, versi Go ikut `backend/go.mod` via `go-version-file`, `permissions: contents: read` (least privilege), tanpa step yang butuh database. Branch `Dev` dibuat dari main identik dan di-push ke origin; push pertama memicu run CI pertama | versioning |
