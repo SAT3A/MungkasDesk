@@ -1,8 +1,12 @@
 {
-  "0": "main.go",
+  "0": "database.go",
   "1": "github.com/gin-gonic/gin.Context",
-  "2": "createUser",
-  "3": "User",
-  "4": "connectDB",
-  "5": "mungkasdesk/backend"
+  "2": "validate.go",
+  "3": "model.go",
+  "4": "package.json",
+  "5": "mungkasdesk/backend",
+  "6": "handlers_auth.go",
+  "7": "handlers_users.go",
+  "8": "helpers.js",
+  "9": "run.js"
 }

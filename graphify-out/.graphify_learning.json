@@ -1,18 +1,18 @@
 {
-  "generated_at": "2026-11-11T07:37:09.957057+00:00",
+  "generated_at": "2026-11-12T08:11:31.501158+00:00",
   "nodes": {
     "backend_cmd_api_main": {
-      "code_fingerprint": "0d67a881bdccd5018b1eebee0d576c1bd6b209c63c9b423c01db7f3de7bb1439",
+      "code_fingerprint": "972d8a01ee595ae54cf70f8c55479c82f51607c11d3bdf1da262a22e6cd3b490",
       "label": "main.go",
-      "last": "2026-11-11T07:36:54.417306+00:00",
+      "last": "2026-11-12T08:11:23.425998+00:00",
       "provenance": [
         {
-          "date": "2026-11-11T07:36:54.417306+00:00",
+          "date": "2026-11-12T08:11:23.425998+00:00",
           "outcome": "useful",
-          "q": "Bagaimana cara apply perubahan schema database di project ini?"
+          "q": "Audit commit 87efe5a: apakah integritas graph dan lokasi simbol valid?"
         }
       ],
-      "score": 0.999995844,
+      "score": 0.999997841,
       "source_file": "backend/cmd/api/main.go",
       "status": "tentative",
       "uses": 1

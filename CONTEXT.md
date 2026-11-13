@@ -3,7 +3,7 @@
 > Dokumen "otak project". Target pembaca: coding agent / developer lain yang perlu kerja di
 > repo ini **tanpa harus baca semua kode dari nol**. Ibarat handover ke tim IT berikutnya.
 >
-> Terakhir diperbarui: **12 November 2026** (backend di-refactor: 1 file jadi 6 file dalam 1 package — main.go jadi kerangka/route; agent `versioning` ada untuk urusan GitHub).
+> Terakhir diperbarui: **13 November 2026** (endpoint DELETE user DIHAPUS dari API; jalur "matikan user" kini PATCH `is_active: false`, soft delete hanya via psql manual).
 > Kalau ada perubahan besar di kode, perbarui dokumen ini juga — dokumen basi lebih bahaya daripada tidak ada.
 
 ---
@@ -35,7 +35,7 @@ yang sudah diterbitkan manual. Satu pengguna (pemilik aplikasi), tidak ada regis
 
 **Status realita saat ini (pahami dulu SEBELUM ngoding):**
 
-- Yang **SUDAH ada**: satu REST API Go/Gin untuk **manajemen user** (CRUD + soft delete + login),
+- Yang **SUDAH ada**: satu REST API Go/Gin untuk **manajemen user** (list/detail/create/update + login; endpoint DELETE dihapus 13 Nov 2026),
   di folder `backend/cmd/api/` — **6 file dalam satu package `main`** (main.go = kerangka+route,
   database.go, model.go, handlers_users.go, handlers_auth.go, validate.go; hasil refactor
   12 Nov 2026 dari 1 file ~705 baris, tingkah laku API tidak berubah) + **satu tabel** `users` di PostgreSQL.
@@ -82,15 +82,18 @@ kosmetik saja; `go mod tidy` akan memindahkannya ke blok direct.
 MungkasDesk/
 ├── CONTEXT.md                  # dokumen ini
 ├── AGENTS.md                   # aturan graphify + panduan sesi (dibaca agent)
-├── opencode.jsonc, .opencode/  # config OpenCode; CONTEXT.md di-load via "instructions" + 4 agent custom: planner/executor/testing/versioning
+├── opencode.jsonc, .opencode/  # config OpenCode; CONTEXT.md di-load via "instructions" + 4 agent custom: planner/executor/testing/versioning + MCP server "playwright"
+├── .agents/
+│   └── skills/playwright-skill/  # skill browser automation (lackeyjb, npm-installable; dependensi via npm run setup di folder itu — node_modules di-gitignore)
+├── reports/                    # hasil testing agent: TEST-REPORT-*.html + assets/ (screenshot) + scripts/ (script Playwright reusable)
 ├── graphify-out/               # knowledge graph project (query sebelum baca kode)
-├── .gitignore                  # *.exe, backend/.env
+├── .gitignore                  # *.exe, backend/.env, node_modules skill .agents/
 └── backend/
     ├── cmd/api/
     │   ├── main.go             # KERANGKA/pusat: connectDB, daftar route, jalankan server, health
     │   ├── database.go         # var db (pgxpool) + connectDB() — satu-satunya tempat urusan koneksi
     │   ├── model.go            # struct: User, CreateUserInput, UpdateUserInput, LoginInput
-    │   ├── handlers_users.go   # endpoint CRUD user + soft delete
+    │   ├── handlers_users.go   # endpoint user (list/detail/create/update)
     │   ├── handlers_auth.go    # endpoint login
     │   └── validate.go         # helper validasi: parseUserID, containsUpper, containsSymbol
     ├── db/init_users.sql       # schema tabel users (idempotent, dijalankan manual via psql)
@@ -114,8 +117,9 @@ Server: `http://localhost:8080`.
 | GET | `/api/v1/users` | `getUsers` | 200 | List user aktif saja, `data` = array (dijamin `[]` bukan `null` saat kosong) |
 | POST | `/api/v1/users` | `createUser` | 201 | Body `{username, password}` |
 | GET | `/api/v1/users/:id` | `getUserByID` | 200 | `:id` wajib UUID valid, else 400 |
-| PATCH | `/api/v1/users/:id` | `updateUser` | 200 | Partial update; body `{username?/is_active?}` |
-| DELETE | `/api/v1/users/:id` | `softDeleteUser` | 200 | Soft delete (baris tetap ada), sukses tanpa field `data` |
+| PATCH | `/api/v1/users/:id` | `updateUser` | 200 | Partial update; body `{username?/is_active?}`. Ini satu-satunya jalur "mematikan" user: `{is_active: false}` |
+
+> **Catatan (13 Nov 2026):** route `DELETE /api/v1/users/:id` (`softDeleteUser`) **sudah dihapus atas permintaan user** — endpoint-nya kini 404. Kolom `deleted_at` dan filter `deleted_at IS NULL` di semua query TETAP dipertahankan (baris yang sudah ter-soft delete via psql masih ter-filter), tapi API tidak lagi menyediakan jalur hapus apa pun.
 
 ### Bentuk response (envelope konsisten)
 
@@ -155,7 +159,7 @@ created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 deleted_at    TIMESTAMPTZ NULL          -- NULL = belum dihapus (soft delete marker)
 ```
 
-- Soft delete: `DELETE` endpoint hanya mengisi `deleted_at = now()`. **Tidak ada hard delete dari aplikasi.**
+- Soft delete: **tidak ada lagi endpoint DELETE** (dihapus 13 Nov 2026). Penanda `deleted_at` tetap ada di schema; mengisi-nya kini hanya via psql manual: `UPDATE users SET deleted_at = now() WHERE id = '<uuid>';`. **Tidak ada hard delete dari aplikasi.**
 - Semua query user menambahkan `AND deleted_at IS NULL` → user terhapus "hilang" dari API tapi datanya masih di DB.
 - Restore manual (dari psql): `UPDATE users SET deleted_at = NULL WHERE id = '<uuid>';`
 - Lihat data terhapus: `SELECT * FROM users WHERE deleted_at IS NOT NULL;`
@@ -212,6 +216,9 @@ go build -o api.exe ./cmd/api
 ## 8. Keputusan desain penting + alasannya
 
 1. **Soft delete, bukan hard delete** — data bisa diperiksa/dipulihkan; FK tidak ikut runtuh.
+   (Sejak 13 Nov 2026: endpoint DELETE dihapus dari API — kolom `deleted_at` tetap dipertahankan
+   di schema dan di semua filter query, tapi mengisinya hanya lewat psql manual. Jalur API untuk
+   "mematikan" user = PATCH `{is_active: false}`.)
 2. **Pesan login generik** — username tidak ada dan password salah sama-sama 401 dengan pesan
    identik, supaya orang tidak bisa mengintip username mana yang terdaftar.
 3. **Cek `is_active` sebelum bcrypt di login** — user nonaktif langsung 403
@@ -303,7 +310,8 @@ Skrip tes reusable (dibuat saat QA) juga kemungkinan sudah terhapus:
 | Mulai fase 1 sesungguhnya (personas, content_posts, kalender) | Blueprint lama dihapus dari repo — ambil dari riwayat: `git show f6a8abf:PLAN.md > PLAN.md`; sadari divergensi stack di §1 (bcrypt vs Argon2id, username vs email, SQL manual vs sqlc/Goose): putuskan dulu mau porsi mana yang diadopsi |
 | Paham alur login | `login()` di `handlers_auth.go` — 4 langkah: cari user (case-insensitive) → 401 generik → 403 nonaktif → bcrypt → update `last_login_at` |
 | Lanjutkan sesi agent sebelumnya | Dari root repo ini: `opencode -c` (sesi terakhir) atau `opencode -s <sessionID>`; cari ID lewat `opencode session list`. Sesi disimpan di background service — terminal ditutup pun masih bisa dilanjutkan |
-| Restore user terhapus | `UPDATE users SET deleted_at = NULL WHERE id = '<uuid>';` (psql manual, by design tidak ada endpoint-nya) |
+| Restore user terhapus | `UPDATE users SET deleted_at = NULL WHERE id = '<uuid>';` (psql manual). Menghapus juga kini hanya via psql (`UPDATE ... SET deleted_at = now()`) — endpoint DELETE sudah dihapus 13 Nov 2026 |
+| Testing via browser (UI/E2E) | Agent `testing` — MCP `playwright` untuk kontrol interaktif (Code Mode: `tools.playwright.*`), skill `playwright-skill` untuk script reusable (script disimpan di `reports/scripts/`, bukan folder temp). WAJIB diakhiri laporan `reports/TEST-REPORT-*.html` |
 | Push / tag rilis / bikin GitHub Actions | Panggil agent **versioning** (`.opencode/agents/versioning.md`) — dia yang urus commit+hook build/vet, SemVer `vX.Y.Z`, `CHANGELOG.md`, dan workflow di `.github/workflows/` (folder itu belum ada; dibuat saat diminta). Push & `gh release` tetap minta approval |
 
 ---
@@ -322,3 +330,5 @@ Jejak update CONTEXT.md — WAJIB ditambah baris baru di sini tiap task selesai
 | 12 Nov 2026 | Warna agent `versioning` final: **merah `#e5484d`** (percobaan sebelumnya hijau → ungu `#8250df`, keduanya ditolak user) — hanya 1 baris frontmatter, tidak ada logika yang berubah | executor |
 | 12 Nov 2026 | **PLAN.md dihapus dari repo** atas permintaan user (blueprint fase 1; isi masih bisa diambil via `git show f6a8abf:PLAN.md`). Rujukan PLAN.md & TEST-REPORT-API.md dibersihkan di §1, §3, §9, §11, §12 — file QA laporan ternyata juga sudah tidak ada di disk. Semua commit lokal dipush ke `origin/main` (6 commit, pertama kali ke-push selain initial commit) | executor |
 | 12 Nov 2026 | **Refactor struktur backend**: `cmd/api/main.go` (1 file ~705 baris) dipecah jadi 6 file satu package `main` — main.go (kerangka+route+health), database.go, model.go, handlers_users.go, handlers_auth.go, validate.go. Nol perubahan logika; komentar dipindah utuh. Bonus: komentar menyesatkan F7 diperbaiki saat dipindah. Build + vet bersih, smoke test health/users 200, graphify diupdate (43 nodes/64 edges). Konvensi §6 diubah: pecah per file dulu, package baru menyusul | executor |
+| 13 Nov 2026 | **Infra testing Playwright**: (1) MCP server `playwright` dari microsoft/playwright-mcp dipasang project-local di `opencode.jsonc` — package npm `@playwright/mcp` via npx (bukan clone repo), flags `--headless --isolated`, terverifikasi `opencode mcp list` = connected; (2) skill `playwright-skill` (lackeyjb v5.0.0) dipasang via CLI `npx skills add --agent opencode` → `.agents/skills/playwright-skill/`, dependensi playwright+chromium via `npm run setup` di folder skill (node_modules di-gitignore); (3) agent `testing.md` dirombak: dua mode Playwright (MCP interaktif vs skill script reusable di `reports/scripts/`), izin edit di-scope `reports/*` (deny `*` dulu lalu allow `reports/*` — last match wins), WAJIB generate `reports/TEST-REPORT-*.html` self-contained (CSS inline, tanpa kredensial) tiap akhir sesi test. Struktur §3 + baris §12 + .gitignore ikut diperbarui | executor |
+| 13 Nov 2026 | **Endpoint DELETE user dihapus dari API** (permintaan user): route `DELETE /api/v1/users/:id` dicabut dari main.go, handler `softDeleteUser` dihapus dari handlers_users.go (~53 baris). Kolom `deleted_at` + filter `deleted_at IS NULL` di SEMUA query tetap dipertahankan (soft delete kini hanya via psql manual); jalur API "mematikan" user = PATCH `{is_active: false}`. Build + vet bersih, smoke test: DELETE → 404, health → 200. Tabel endpoint §4, §5, §8.1, baris §12 ikut diperbarui; handler tinggal 4 (getUsers, getUserByID, updateUser, createUser) | executor |

@@ -17,7 +17,7 @@ import (
 )
 
 // ============================================================
-// HANDLER — USERS (list, detail, create, update, soft delete)
+// HANDLER — USERS (list, detail, create, update)
 // Semua endpoint yang bekerja pada data user ada di sini. Satu file
 // per "domain" (users vs auth) supaya saat backend tumbuh, tiap domain
 // punya rumah sendiri tanpa langsung perlu package/folder baru.
@@ -238,60 +238,6 @@ func updateUser(c *gin.Context) {
 		"success": true,
 		"message": message,
 		"data":    u,
-	})
-}
-
-// softDeleteUser: DELETE /users/{id} — "menghapus" user secara LOGIS (soft delete).
-//
-// Baris di database TIDAK benar-benar dihapus. Yang berubah hanya kolom
-// deleted_at: dari NULL jadi waktu sekarang (now() dari PostgreSQL).
-// Keuntungannya:
-//   - data masih ada kalau suatu saat perlu diperiksa atau dipulihkan
-//   - tidak ada data lain yang ikut hilang
-//
-// Konsekuensinya: endpoint user lain memakai syarat deleted_at IS NULL,
-// jadi user yang sudah dihapus logis gak muncul lagi di list/detail/update.
-//
-// QueryRow + RETURNING dipakai (bukan Exec) supaya kita dapat username dan
-// waktu hapusnya untuk pesan response. ErrNoRows di sini artinya user tidak
-// ada ATAU sudah pernah dihapus — keduanya dibalas 404.
-func softDeleteUser(c *gin.Context) {
-	ctx := context.Background()
-
-	id, ok := parseUserID(c)
-	if !ok {
-		return
-	}
-
-	var username string
-	var deletedAt time.Time
-	err := db.QueryRow(ctx,
-		`UPDATE users
-		 SET deleted_at = now()
-		 WHERE id = $1 AND deleted_at IS NULL
-		 RETURNING username, deleted_at`,
-		id,
-	).Scan(&username, &deletedAt)
-
-	if errors.Is(err, pgx.ErrNoRows) {
-		c.JSON(http.StatusNotFound, gin.H{
-			"success": false,
-			"message": "User tidak ditemukan (atau sudah pernah dihapus)",
-		})
-		return
-	}
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"success": false,
-			"message": "Gagal menghapus user",
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"success": true,
-		"message": fmt.Sprintf("User %s dihapus %s",
-			username, deletedAt.Format("2006-01-02 15:04:05")),
 	})
 }
 

@@ -1,8 +1,8 @@
 {
   "backend/cmd/api/main.go": {
-    "mtime": 1794386230.8495853,
-    "seen": 1794460797.1134026,
-    "ast_hash": "192c862f14237e390374c00fc3a381a9",
+    "mtime": 1794558483.494388,
+    "seen": 1794558648.651225,
+    "ast_hash": "1e51b9b2b1418e4964a1213291cefe74",
     "semantic_hash": ""
   },
   "backend/go.mod": {
@@ -17,16 +17,10 @@
     "ast_hash": "b85dce2308440d6a5f9ad47333175ed8",
     "semantic_hash": ""
   },
-  "PLAN.md": {
-    "mtime": 1794198605.461971,
-    "seen": 1794382601.9213524,
-    "ast_hash": "17eb1f773c03f9d94c1686e87a7fa9f0",
-    "semantic_hash": ""
-  },
   ".opencode/agents/executor.md": {
-    "mtime": 1794388297.87911,
-    "seen": 1794460797.1134026,
-    "ast_hash": "0c1e42f8d6dd19a7a05483a31ce867eb",
+    "mtime": 1794471783.677228,
+    "seen": 1794558648.6528537,
+    "ast_hash": "5f6737aab7f6b5154a99ea9b614845a9",
     "semantic_hash": ""
   },
   ".opencode/agents/planner.md": {
@@ -36,21 +30,15 @@
     "semantic_hash": ""
   },
   ".opencode/agents/testing.md": {
-    "mtime": 1794388297.87911,
-    "seen": 1794460797.1134026,
-    "ast_hash": "4395bb56cf63d0ec93bafa208aa38379",
+    "mtime": 1794558095.5531332,
+    "seen": 1794558648.6548822,
+    "ast_hash": "ea0eb0765ce0ebb72166aeaa7570017a",
     "semantic_hash": ""
   },
   "CONTEXT.md": {
-    "mtime": 1794460733.626521,
-    "seen": 1794460797.1134026,
-    "ast_hash": "d7ba949c10da17fd5ecf09ec9300dd07",
-    "semantic_hash": ""
-  },
-  "TEST-REPORT-API.md": {
-    "mtime": 1794460055.7106397,
-    "seen": 1794460797.1145182,
-    "ast_hash": "efe0af0160657e4f7e103620532fbb49",
+    "mtime": 1794558697.602064,
+    "seen": 1794559276.5130017,
+    "ast_hash": "120330a1a952b6435e2e333d541f5947",
     "semantic_hash": ""
   },
   "graphify-out/memory/query_20261111_073654_bfde5623_bagaimana_cara_apply_perubahan_schema_database_di.md": {
@@ -63,6 +51,90 @@
     "mtime": 1794382623.2385283,
     "seen": 1794460797.115101,
     "ast_hash": "0c43d0493e94f61a0036d90777e71208",
+    "semantic_hash": ""
+  },
+  "backend/cmd/api/database.go": {
+    "mtime": 1794471593.7237415,
+    "seen": 1794471727.9490712,
+    "ast_hash": "4dfcb56cc0cf4cbc488946e01ad60dde",
+    "semantic_hash": ""
+  },
+  "backend/cmd/api/handlers_auth.go": {
+    "mtime": 1794471593.7870033,
+    "seen": 1794471727.9490712,
+    "ast_hash": "6c0b8962373a86ab1e1afb4a61fae984",
+    "semantic_hash": ""
+  },
+  "backend/cmd/api/handlers_users.go": {
+    "mtime": 1794558505.3235831,
+    "seen": 1794558648.651225,
+    "ast_hash": "e28151f8bb82316830046afbd239dbd7",
+    "semantic_hash": ""
+  },
+  "backend/cmd/api/model.go": {
+    "mtime": 1794471593.715112,
+    "seen": 1794471727.9490712,
+    "ast_hash": "46d6ffae1f4030dda4b858daf69d674f",
+    "semantic_hash": ""
+  },
+  "backend/cmd/api/validate.go": {
+    "mtime": 1794471593.7237415,
+    "seen": 1794471727.9490712,
+    "ast_hash": "76b58189dec43772feed24099c56e24e",
+    "semantic_hash": ""
+  },
+  ".opencode/agents/versioning.md": {
+    "mtime": 1794462583.1029615,
+    "seen": 1794471727.9536297,
+    "ast_hash": "eb262efd48e27c3ded62026182c75b48",
+    "semantic_hash": ""
+  },
+  "graphify-out/memory/query_20261112_081123_08ec1684_audit_commit_87efe5a__apakah_integritas_graph_dan.md": {
+    "mtime": 1794471083.4350417,
+    "seen": 1794471727.95566,
+    "ast_hash": "e4f8d16b98b66f03ac0e5b8e65f99a9e",
+    "semantic_hash": ""
+  },
+  ".agents/skills/playwright-skill/lib/helpers.js": {
+    "mtime": 1794557992.012909,
+    "seen": 1794558648.6491735,
+    "ast_hash": "3a1ccdc38a0e8c7ab07aa9adaac4dec3",
+    "semantic_hash": ""
+  },
+  ".agents/skills/playwright-skill/package.json": {
+    "mtime": 1794557992.0186863,
+    "seen": 1794558648.6491735,
+    "ast_hash": "3a9045cafb7e2ed0da3fda1391387c14",
+    "semantic_hash": ""
+  },
+  ".agents/skills/playwright-skill/run.js": {
+    "mtime": 1794557992.0186863,
+    "seen": 1794558648.6491735,
+    "ast_hash": "9d5ad477b42456450ade94070572a5d2",
+    "semantic_hash": ""
+  },
+  "skills-lock.json": {
+    "mtime": 1794558007.7143066,
+    "seen": 1794558648.6528537,
+    "ast_hash": "4b1cdfa57526d7f7fa076a2c21ca2e49",
+    "semantic_hash": ""
+  },
+  ".agents/skills/playwright-skill/API_REFERENCE.md": {
+    "mtime": 1794557992.0103912,
+    "seen": 1794558648.6528537,
+    "ast_hash": "60318a155c172e6f568bf81a8a686e55",
+    "semantic_hash": ""
+  },
+  ".agents/skills/playwright-skill/SKILL.md": {
+    "mtime": 1794557992.012909,
+    "seen": 1794558648.6528537,
+    "ast_hash": "8514292844547ed091f24f5686f80487",
+    "semantic_hash": ""
+  },
+  ".agents/skills/playwright-skill/package-lock.json": {
+    "mtime": 1794558090.3138955,
+    "seen": 1794558648.6651077,
+    "ast_hash": "9d9f0cf76194508990857a99d41fcf24",
     "semantic_hash": ""
   }
 }

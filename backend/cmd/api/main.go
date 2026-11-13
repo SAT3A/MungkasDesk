@@ -16,7 +16,7 @@ import (
 //
 //	database.go        → var db + connectDB() (koneksi PostgreSQL)
 //	model.go           → struct data (User, input request)
-//	handlers_users.go  → endpoint CRUD user + soft delete
+//	handlers_users.go  → endpoint user (list/detail/create/update)
 //	handlers_auth.go   → endpoint login
 //	validate.go        → helper validasi (UUID, aturan password)
 //
@@ -58,7 +58,12 @@ func main() {
 		api.POST("/users", createUser)
 		api.GET("/users/:id", getUserByID)
 		api.PATCH("/users/:id", updateUser)
-		api.DELETE("/users/:id", softDeleteUser) // route DELETE, tapi isinya soft delete (baris tetap ada)
+
+		// Catatan: TIDAK ada route DELETE — user diminta nonaktif via
+		// PATCH {is_active: false}. Menghapus data dari API sengaja tidak
+		// disediakan supaya tidak ada jalur hilangnya data dari aplikasi.
+		// (Baris user yang sudah soft delete di DB tetap di-filter
+		// deleted_at IS NULL di semua handler.)
 	}
 
 	log.Println("Server jalan di http://localhost:8080")
