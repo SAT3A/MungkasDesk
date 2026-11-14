@@ -1,8 +1,8 @@
 {
-  "generated_at": "2026-11-12T08:11:31.501158+00:00",
+  "generated_at": "2026-11-14T10:23:33.521070+00:00",
   "nodes": {
     "backend_cmd_api_main": {
-      "code_fingerprint": "972d8a01ee595ae54cf70f8c55479c82f51607c11d3bdf1da262a22e6cd3b490",
+      "code_fingerprint": "60b2037ec44d5b789ef31c8379110751437f2b599d55582dc7cc4c9c6217e45b",
       "label": "main.go",
       "last": "2026-11-12T08:11:23.425998+00:00",
       "provenance": [
@@ -12,7 +12,7 @@
           "q": "Audit commit 87efe5a: apakah integritas graph dan lokasi simbol valid?"
         }
       ],
-      "score": 0.999997841,
+      "score": 0.952818865,
       "source_file": "backend/cmd/api/main.go",
       "status": "tentative",
       "uses": 1

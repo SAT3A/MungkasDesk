@@ -3,7 +3,7 @@
 > Dokumen "otak project". Target pembaca: coding agent / developer lain yang perlu kerja di
 > repo ini **tanpa harus baca semua kode dari nol**. Ibarat handover ke tim IT berikutnya.
 >
-> Terakhir diperbarui: **13 November 2026** (Alur kerja resmi: fitur dikerjakan di branch **Dev** → push → CI otomatis → PR `Dev → main` → merge. CI GitHub Actions aktif: `.github/workflows/ci.yml` — vet/test/build Go. Endpoint DELETE user sudah dihapus — jalur "matikan user" kini PATCH `is_active: false`, soft delete hanya via psql manual).
+> Terakhir diperbarui: **14 November 2026** (setup laptop kedua selesai — Go 1.27.4 amd64, opencode V2 2.3.0, graphify, playwright-skill; **database belum disetup** sehingga backend belum bisa di-run di laptop ini. Alur kerja resmi: fitur dikerjakan di branch **Dev** → push → CI otomatis → PR `Dev → main` → merge. CI GitHub Actions aktif: `.github/workflows/ci.yml` — vet/test/build Go. Endpoint DELETE user sudah dihapus — jalur "matikan user" kini PATCH `is_active: false`, soft delete hanya via psql manual).
 > Kalau ada perubahan besar di kode, perbarui dokumen ini juga — dokumen basi lebih bahaya daripada tidak ada.
 
 ---
@@ -299,6 +299,28 @@ Skrip tes reusable (dibuat saat QA) juga kemungkinan sudah terhapus:
 - Repo path mengandung **spasi** (`C:\Satria Punya\MungkasDesk`) — selalu quote path di shell.
 - File QA besar sudah hilang dari disk; kalau butuh bukti detail, jalankan ulang QA.
 
+### Gotcha laptop kedua (`C:\mungkas-desk`, setup 14 Nov 2026)
+
+- **Go**: upgrade MSI in-place dari 1.26.5 (386) ke 1.27.4 meninggalkan file stdlib campuran
+  dua versi di `C:\Program Files\Go\src\` → build gagal dengan error "redeclared" di
+  `internal/strconv` walau versi `go version` sudah benar. Fix terverifikasi: uninstall
+  produk Go via `msiexec /X{ProductCode}` (butuh UAC/admin; exit 1730 kalau non-elevated),
+  hapus dir `C:\Program Files\Go`, install ulang via winget `--source winget` (msstore
+  error 0x80072ee2).
+- **PostgreSQL: DUA cluster jalan bersamaan** — v15 di port **5432**, v16 di port **5433**
+  (terbaca dari `postgresql.conf` masing-masing data dir). Keduanya password-auth, tidak ada
+  trust. `db mungkasdesk` + `backend/.env` **belum dibuat** (ditunda user) — backend belum
+  bisa di-run di laptop ini sampai DB disetup.
+- **opencode = V2 2.3.0** (dari V1 1.19.4): config project ini ditulis untuk V2 (`permissions`
+  format array), V1 menolaknya. Install npm `@opencode/cli` di Windows WAJIB
+  `npm install -g --allow-scripts=@opencode/cli` — tanpa itu postinstall (pemilih binary
+  native) diblokir policy allowScripts npm dan CLI tidak berfungsi.
+- **Config global opencode laptop ini TIDAK punya provider `bansos-ai`** (yang ada `9router`,
+  baseURL sama). Model default project `bansos-ai/codingforFree` tidak resolve → pilih model
+  manual via Tab tiap sesi. Global config sengaja tidak diubah (keputusan user).
+- graphify CLI 0.9.108 via `uv tool install graphifyy`; dependensi playwright-skill + chromium
+  sudah terpasang (`npm run setup` di `.agents/skills/playwright-skill/`).
+
 ---
 
 ## 12. Peta cepat: "kalau mau X, sentuh Y"
@@ -336,3 +358,4 @@ Jejak update CONTEXT.md — WAJIB ditambah baris baru di sini tiap task selesai
 | 13 Nov 2026 | **Endpoint DELETE user dihapus dari API** (permintaan user): route `DELETE /api/v1/users/:id` dicabut dari main.go, handler `softDeleteUser` dihapus dari handlers_users.go (~53 baris). Kolom `deleted_at` + filter `deleted_at IS NULL` di SEMUA query tetap dipertahankan (soft delete kini hanya via psql manual); jalur API "mematikan" user = PATCH `{is_active: false}`. Build + vet bersih, smoke test: DELETE → 404, health → 200. Tabel endpoint §4, §5, §8.1, baris §12 ikut diperbarui; handler tinggal 4 (getUsers, getUserByID, updateUser, createUser) | executor |
 | 13 Nov 2026 | **CI GitHub Actions + branch Dev** (versioning): `.github/workflows/ci.yml` dibuat — trigger push ke `main` & `Dev` + `pull_request`; job build runner ubuntu: `go vet` / `go test` / `go build`, `working-directory: backend`, versi Go ikut `backend/go.mod` via `go-version-file`, `permissions: contents: read` (least privilege), tanpa step yang butuh database. Branch `Dev` dibuat dari main identik dan di-push ke origin; push pertama memicu run CI pertama | versioning |
 | 13 Nov 2026 | **Alur kerja branch resmi dicatat** (versioning): fitur dikerjakan di `Dev` → CI otomatis (trigger push Dev + PR) → merge via PR `Dev → main`; belum ada branch protection, disiplin manual dulu. Demo pertama alur ini: baris changelog ini di-commit & di-push DARI Dev (memicu run CI kedua); `main` akan menerima-nya lewat PR | versioning |
+| 14 Nov 2026 | **Setup laptop kedua** (`C:\mungkas-desk`, tanpa spasi di path): repo di-clone dari GitHub; agent planner/executor/testing/versioning otomatis aktif (file `.opencode/agents/`, project-local). Go di-upgrade 1.26.5(386)→1.27.4 amd64 — upgrade MSI in-place ternyata meninggalkan file stdlib campuran dua versi → build gagal "redeclared" di `internal/strconv`; fix: uninstall bersih + install ulang (script elevated, 1x UAC). opencode V1 1.19.4 diganti **V2 2.3.0** (config project ditulis untuk V2; `npm install -g --allow-scripts=@opencode/cli @opencode/cli` — postinstall dipilih npm policy allowScripts). graphify 0.9.108 via `uv tool install graphifyy`. Playwright-skill: `npm run setup` sukses (chromium 151 + headless shell); MCP playwright `connected`. Build + vet backend OK tanpa perubahan kode. **Database ditunda** (keputusan user): 2 cluster PG terdeteksi (v15@5432, v16@5433, keduanya password-auth), `db mungkasdesk` + `backend/.env` belum dibuat. **Config global opencode tidak disentuh** (keputusan user): provider `bansos-ai` tidak ada di global laptop ini → model default `bansos-ai/codingforFree` tidak resolve, pilih model manual via Tab. Gotcha laptop kedua ditambah di §11 | setup (sesi utama) |
